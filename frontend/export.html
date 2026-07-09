@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — Clinical Export</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #print-btn { display: none !important; }
+      #back-btn { display: none !important; }
+      @page { margin: 0.5in; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans p-8">
+
+  <div class="max-w-4xl mx-auto bg-white p-10 shadow-lg" id="export-container">
+    
+    <div class="flex items-center justify-between mb-8 border-b border-gray-200 pb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Cardiology Data Export</h1>
+        <p class="text-gray-500 mt-1">Patient Symptom & Trigger Time-Series Log</p>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-semibold text-gray-700" id="report-date"></p>
+        <div class="mt-3 flex gap-2 justify-end">
+          <a href="dashboard.html" id="back-btn" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">Back</a>
+          <select id="export-timeframe" class="px-3 py-2 bg-white border border-gray-300 rounded text-sm text-gray-700 outline-none print:hidden">
+            <option value="7">Last 7 Days</option>
+            <option value="14">Last 14 Days</option>
+            <option value="30">Last 30 Days</option>
+            <option value="all">All Time</option>
+          </select>
+          <button id="print-btn" class="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 print:hidden" onclick="window.print()">Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
+      <h2 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Clinical Summary</h2>
+      <div id="summary-content" class="text-sm text-gray-800 space-y-2">
+        Loading...
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <table class="w-full text-sm border-collapse">
+      <thead>
+        <tr class="bg-gray-100 text-gray-600 border-b border-gray-300 text-left">
+          <th class="p-3 font-semibold w-1/6">Date & Time</th>
+          <th class="p-3 font-semibold w-1/6">Symptom</th>
+          <th class="p-3 font-semibold w-1/6">Context</th>
+          <th class="p-3 font-semibold w-1/4 bg-blue-50/50">Prior Intake (24h)</th>
+          <th class="p-3 font-semibold w-1/4 text-red-600">Red Flags / Notes</th>
+        </tr>
+      </thead>
+      <tbody id="export-tbody" class="divide-y divide-gray-200">
+        <!-- Rows injected via JS -->
+      </tbody>
+    </table>
+
+  </div>
+
+  <script src="js/export.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — History</title>
+  <meta name="description" content="View your aggregated health history by date with symptom highlighting." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            heart:  { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d' },
+            navy:   { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#1e3a5f' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .card { background:#fff; border:1px solid #e2e8f0; }
+    .fade-in { animation: fadeIn .45s ease both; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    
+    /* Light theme symptom row highlighting */
+    .symptom-row { background: rgba(220,38,38,.04) !important; border-left: 3px solid rgba(220,38,38,.4); }
+    
+    .filter-btn.active { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+    table { border-collapse: separate; border-spacing: 0; }
+    th { position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #e2e8f0; }
+    td { border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-navy-900">
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="dashboard.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-heart-600 flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-navy-900">Health<span class="text-heart-600">Log</span></span>
+      </a>
+      <div class="flex items-center gap-1 text-sm">
+        <a href="dashboard.html" class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Dashboard</a>
+        <a href="log.html"       class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Log</a>
+        <a href="history.html"   class="px-3.5 py-2 rounded-lg bg-heart-50 text-heart-700 font-medium">History</a>
+        <a href="education.html" class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Learn</a>
+        <button id="logout-btn" class="ml-2 px-3.5 py-2 rounded-lg text-gray-400 hover:text-heart-600 hover:bg-heart-50 transition text-xs font-medium uppercase tracking-wider">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+    <!-- Header & Filters -->
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 fade-in">
+      <div>
+        <h1 class="text-2xl font-bold text-navy-900 mb-1">History</h1>
+        <p class="text-gray-500 text-sm">All your logged data, aggregated by date</p>
+      </div>
+      <div class="flex gap-2">
+        <button data-days="7"  class="filter-btn active px-4 py-2 rounded-xl text-xs font-semibold border border-gray-200 bg-white text-gray-500 hover:text-navy-900 transition">7 days</button>
+        <button data-days="14" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold border border-gray-200 bg-white text-gray-500 hover:text-navy-900 transition">14 days</button>
+        <button data-days="30" class="filter-btn px-4 py-2 rounded-xl text-xs font-semibold border border-gray-200 bg-white text-gray-500 hover:text-navy-900 transition">30 days</button>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="flex items-center gap-4 mb-4 text-xs text-gray-500 fade-in" style="animation-delay:.05s">
+      <span class="flex items-center gap-1.5"><span class="inline-block w-3 h-3 rounded bg-red-100 border border-red-300"></span> Symptom / Bad mood day</span>
+      <span id="row-count" class="ml-auto text-gray-500"></span>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="text-center py-20 fade-in">
+      <div class="inline-block w-8 h-8 border-2 border-heart-100 border-t-heart-500 rounded-full animate-spin"></div>
+      <p class="mt-3 text-gray-400 text-sm">Loading your history…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden text-center py-20 fade-in">
+      <p class="text-gray-500 text-lg">No data yet for this period.</p>
+      <a href="log.html" class="inline-block mt-4 px-6 py-2.5 rounded-xl bg-heart-600 text-white text-sm font-semibold hover:bg-heart-700 hover:-translate-y-[1px] transition shadow-md">Start Logging →</a>
+    </div>
+
+    <!-- Table -->
+    <div id="table-wrap" class="hidden card rounded-2xl overflow-hidden shadow-sm fade-in" style="animation-delay:.1s">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
+              <th class="px-5 py-3.5 font-semibold bg-white/95 backdrop-blur">Date</th>
+              <th class="px-5 py-3.5 font-semibold bg-white/95 backdrop-blur">Mood</th>
+              <th class="px-5 py-3.5 font-semibold bg-white/95 backdrop-blur">Notes</th>
+              <th class="px-5 py-3.5 font-semibold bg-white/95 backdrop-blur text-center">Event Count</th>
+              <th class="px-5 py-3.5 font-semibold bg-white/95 backdrop-blur text-center">Avg HR</th>
+            </tr>
+          </thead>
+          <tbody id="history-body" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/history.js"></script>
+  <script>
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

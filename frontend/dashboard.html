@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — Dashboard</title>
+  <meta name="description" content="Your personal heart health dashboard with insights, trends, and daily metrics." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            heart:  { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d' },
+            navy:   { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#1e3a5f' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .fade-in { animation: fadeIn .45s ease both; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .card { background:#fff; border:1px solid #e2e8f0; transition: transform .2s ease, box-shadow .2s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+    .shimmer { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.8s ease infinite; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .warning-slide { animation: slideDown .4s ease both; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-100%)} to{opacity:1;transform:translateY(0)} }
+    .stat-number { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-navy-900">
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="dashboard.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-heart-600 flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-navy-900">Health<span class="text-heart-600">Log</span></span>
+      </a>
+      <div class="flex items-center gap-1 text-sm">
+        <a href="dashboard.html" class="px-3.5 py-2 rounded-lg bg-heart-50 text-heart-700 font-medium">Dashboard</a>
+        <a href="log.html"       class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Log</a>
+        <a href="history.html"   class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">History</a>
+        <a href="education.html" class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Learn</a>
+        <button id="logout-btn" class="ml-2 px-3.5 py-2 rounded-lg text-gray-400 hover:text-heart-600 hover:bg-heart-50 transition text-xs font-medium uppercase tracking-wider">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ Caffeine Warning Banner ═══ -->
+  <div id="caffeine-warning" class="hidden">
+    <div class="warning-slide bg-heart-600 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </span>
+          <div>
+            <p class="font-semibold text-sm">⚠️ High Caffeine Alert</p>
+            <p id="caffeine-warning-text" class="text-heart-100 text-xs">Your caffeine intake today has exceeded the recommended threshold.</p>
+          </div>
+        </div>
+        <button onclick="document.getElementById('caffeine-warning').classList.add('hidden')" class="text-white/70 hover:text-white transition p-1">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
+      <div>
+        <h1 class="text-2xl font-bold text-navy-900 mb-1">Dashboard</h1>
+        <p class="text-gray-500 text-sm">Your health at a glance — <span id="header-date" class="text-heart-600 font-medium"></span></p>
+      </div>
+      <div class="flex items-center gap-3">
+        <input type="date" id="chart-date-picker" class="px-4 py-2 rounded-xl bg-white border border-gray-200 text-sm text-navy-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition shadow-sm" />
+        <a href="export.html" class="px-5 py-2.5 rounded-xl bg-heart-600 text-white text-sm font-semibold hover:bg-heart-700 shadow-md hover:shadow-lg transition">Export PDF</a>
+      </div>
+    </div>
+
+    <!-- ═══ Today's Metrics Summary Strip ═══ -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 fade-in" style="animation-delay:.05s">
+      <!-- Heart Rate -->
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-lg bg-heart-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-heart-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+          <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Heart Rate</span>
+        </div>
+        <p id="stat-hr" class="stat-number text-2xl font-bold text-navy-900">—</p>
+        <p class="text-xs text-gray-400 mt-1">Daily average</p>
+      </div>
+
+      <!-- Blood Pressure -->
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m0 0v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+          </div>
+          <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Blood Pressure</span>
+        </div>
+        <p id="stat-bp" class="stat-number text-2xl font-bold text-navy-900">—</p>
+        <p class="text-xs text-gray-400 mt-1">Systolic / Diastolic</p>
+      </div>
+
+      <!-- Caffeine -->
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 8h1a4 4 0 010 8h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zm0 13h18"/></svg>
+          </div>
+          <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Caffeine</span>
+        </div>
+        <p id="stat-caffeine" class="stat-number text-2xl font-bold text-navy-900">—</p>
+        <p class="text-xs text-gray-400 mt-1">Daily peak severity</p>
+      </div>
+
+      <!-- Mood -->
+      <div class="card rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Mood</span>
+        </div>
+        <p id="stat-mood" class="stat-number text-2xl font-bold text-navy-900">—</p>
+        <p class="text-xs text-gray-400 mt-1">Morning check-in</p>
+      </div>
+    </div>
+
+    <!-- ═══ Charts Row ═══ -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in" style="animation-delay:.1s">
+      <!-- Chart 1: 24-Hour Overlay Chart -->
+      <div class="card rounded-2xl p-6 relative overflow-hidden group">
+        <div class="absolute inset-0 bg-blue-50/10 pointer-events-none"></div>
+        <div class="flex items-center justify-between mb-5 relative">
+          <div>
+            <h2 class="font-bold text-navy-900">24-Hour Overlay Chart</h2>
+            <p class="text-[11px] text-gray-500 mt-0.5 uppercase tracking-wider font-semibold">Micro View (Single Day)</p>
+          </div>
+        </div>
+        <div class="relative h-64">
+          <canvas id="chart-overlay"></canvas>
+        </div>
+        <p class="text-xs text-gray-400 mt-3 text-center">X-Axis: Time (00:00 - 23:59). Shows correlation between substance intake and acute symptoms.</p>
+      </div>
+
+      <!-- Chart 2: Time-to-Event Histogram -->
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="font-bold text-navy-900">Lag-Time Histogram</h2>
+            <p class="text-[11px] text-gray-500 mt-0.5 uppercase tracking-wider font-semibold">Macro View (Last 14 Days)</p>
+          </div>
+        </div>
+        <div class="relative h-64">
+          <canvas id="chart-histogram"></canvas>
+        </div>
+        <p class="text-xs text-gray-400 mt-3 text-center">Distribution of lag times between a substance intake and a subsequent symptom.</p>
+      </div>
+    </div>
+
+    <!-- ═══ Insight Engine Cards ═══ -->
+    <div class="fade-in" style="animation-delay:.15s">
+      <h2 class="text-xl font-bold text-navy-900 mb-5 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-heart-50 flex items-center justify-center">
+          <svg class="w-4 h-4 text-heart-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </span>
+        Insight Engine
+      </h2>
+
+      <!-- Skeleton -->
+      <div id="insights-loading" class="grid sm:grid-cols-3 gap-5">
+        <div class="rounded-2xl p-6 h-44 shimmer"></div>
+        <div class="rounded-2xl p-6 h-44 shimmer" style="animation-delay:.2s"></div>
+        <div class="rounded-2xl p-6 h-44 shimmer" style="animation-delay:.4s"></div>
+      </div>
+
+      <!-- Populated cards -->
+      <div id="insights-cards" class="hidden grid sm:grid-cols-3 gap-5">
+        <!-- Strongest Trigger -->
+        <div class="card rounded-2xl p-6 border-t-3 border-t-heart-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xl">🎯</span>
+            <h3 class="font-semibold text-heart-700 text-sm">Strongest Trigger</h3>
+          </div>
+          <p id="insight-trigger-name" class="text-navy-900 font-bold text-lg mb-1 capitalize">—</p>
+          <p id="insight-trigger-diff" class="text-2xl font-extrabold text-heart-600 mb-2">— BPM</p>
+          <p id="insight-trigger-msg" class="text-gray-500 text-xs leading-relaxed"></p>
+        </div>
+
+        <!-- Worst Combination -->
+        <div class="card rounded-2xl p-6 border-t-3 border-t-amber-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xl">⚡</span>
+            <h3 class="font-semibold text-amber-700 text-sm">Worst Combination</h3>
+          </div>
+          <p id="insight-combo-name" class="text-navy-900 font-bold text-lg mb-1">—</p>
+          <p id="insight-combo-diff" class="text-2xl font-extrabold text-amber-600 mb-2">— BPM</p>
+          <p id="insight-combo-msg" class="text-gray-500 text-xs leading-relaxed"></p>
+        </div>
+
+        <!-- Symptom Pattern -->
+        <div class="card rounded-2xl p-6 border-t-3 border-t-blue-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xl">🔍</span>
+            <h3 class="font-semibold text-blue-700 text-sm">Symptom Pattern</h3>
+          </div>
+          <p id="insight-symptom-name" class="text-navy-900 font-bold text-lg mb-1 capitalize">—</p>
+          <p id="insight-symptom-count" class="text-2xl font-extrabold text-blue-600 mb-2">— days</p>
+          <p id="insight-symptom-msg" class="text-gray-500 text-xs leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex flex-wrap gap-3 pt-2 pb-8 fade-in" style="animation-delay:.2s">
+      <a href="log.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-heart-600 text-white text-sm font-semibold shadow-md hover:bg-heart-700 hover:translate-y-[-1px] transition-all">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+        Log Today's Data
+      </a>
+      <a href="history.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-navy-700 text-sm font-semibold hover:bg-gray-50 hover:translate-y-[-1px] transition-all">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        View Full History
+      </a>
+    </div>
+  </main>
+
+  <script src="js/dashboard.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — Sign In</title>
+  <meta name="description" content="Track your heart health, lifestyle triggers, and daily wellness with HealthLog." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            heart:  { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d' },
+            navy:   { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#1e3a5f' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .fade-in { animation: fadeIn .5s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .input-focus:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.15); border-color: #dc2626; }
+    .btn-primary { transition: transform .15s ease, box-shadow .15s ease; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,.25); }
+    .heartbeat { animation: heartbeat 1.8s ease-in-out infinite; }
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      14%     { transform: scale(1.15); }
+      28%     { transform: scale(1); }
+      42%     { transform: scale(1.1); }
+      56%     { transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex">
+
+  <!-- Left: Branding Panel -->
+  <div class="hidden lg:flex lg:w-1/2 bg-navy-900 relative overflow-hidden flex-col justify-center items-center px-12 text-white">
+    <!-- Subtle pattern -->
+    <div class="absolute inset-0 opacity-[.04]" style="background-image:url('data:image/svg+xml,%3Csvg width=40 height=40 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M0 0h40v40H0z%22 fill=%22none%22/%3E%3Ccircle cx=20 cy=20 r=1 fill=%22white%22/%3E%3C/svg%3E');"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-heart-600/10 rounded-full blur-[100px]"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px]"></div>
+
+    <div class="relative z-10 text-center max-w-md">
+      <div class="heartbeat inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-heart-600 shadow-xl shadow-heart-600/30 mb-8">
+        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">HealthLog</h1>
+      <p class="text-navy-300 text-lg leading-relaxed mb-8">Track your heart health, understand your lifestyle triggers, and take control of your wellness journey.</p>
+      <div class="flex items-center justify-center gap-6 text-sm text-navy-400">
+        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-heart-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Track vitals</div>
+        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-heart-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Get insights</div>
+        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-heart-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Stay healthy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Auth Forms -->
+  <div class="flex-1 flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md fade-in">
+
+      <!-- Mobile logo -->
+      <div class="lg:hidden text-center mb-8">
+        <div class="heartbeat inline-flex items-center justify-center w-14 h-14 rounded-xl bg-heart-600 shadow-lg shadow-heart-600/20 mb-3">
+          <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <h1 class="text-2xl font-bold text-navy-900">Health<span class="text-heart-600">Log</span></h1>
+      </div>
+
+      <h2 class="text-2xl font-bold text-navy-900 mb-1">Welcome back</h2>
+      <p class="text-gray-500 text-sm mb-8">Sign in to continue tracking your health.</p>
+
+      <!-- Toggle -->
+      <div id="auth-toggle" class="flex bg-gray-100 rounded-xl p-1 mb-8">
+        <button id="btn-login" onclick="showLogin()" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 bg-white text-navy-900 shadow-sm">Sign In</button>
+        <button id="btn-register" onclick="showRegister()" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 text-gray-400 hover:text-gray-600">Register</button>
+      </div>
+
+      <!-- Error -->
+      <div id="auth-error" class="hidden mb-4 p-3 rounded-xl bg-heart-50 border border-heart-200 text-heart-700 text-sm text-center"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-5" onsubmit="return false;">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Email</label>
+          <input id="login-email" type="email" required placeholder="you@example.com"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition-all" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Password</label>
+          <input id="login-password" type="password" required placeholder="••••••••"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition-all" />
+        </div>
+        <button type="submit" id="login-submit"
+          class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white bg-heart-600 hover:bg-heart-700 shadow-md transition-colors">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="space-y-5 hidden" onsubmit="return false;">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Full Name</label>
+          <input id="reg-name" type="text" required placeholder="Your Name"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition-all" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Email</label>
+          <input id="reg-email" type="email" required placeholder="you@example.com"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition-all" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Password</label>
+          <input id="reg-password" type="password" required placeholder="Min 6 characters"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition-all" />
+        </div>
+        <button type="submit" id="reg-submit"
+          class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white bg-heart-600 hover:bg-heart-700 shadow-md transition-colors">
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-center text-gray-400 text-xs mt-8">&copy; 2026 HealthLog. Your health data stays private.</p>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

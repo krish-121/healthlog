@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — Learn</title>
+  <meta name="description" content="Understand arrhythmia, lifestyle triggers, and how to protect your heart health." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            heart:  { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',300:'#fca5a5',400:'#f87171',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b',900:'#7f1d1d' },
+            navy:   { 50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',300:'#9fb3c8',400:'#829ab1',500:'#627d98',600:'#486581',700:'#334e68',800:'#243b53',900:'#1e3a5f' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .card { background:#fff; border:1px solid #e2e8f0; }
+    .fade-in { animation: fadeIn .45s ease both; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .card-hover { transition: transform .25s ease, box-shadow .25s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-navy-900">
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="dashboard.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-heart-600 flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-navy-900">Health<span class="text-heart-600">Log</span></span>
+      </a>
+      <div class="flex items-center gap-1 text-sm">
+        <a href="dashboard.html" class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Dashboard</a>
+        <a href="log.html"       class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Log</a>
+        <a href="history.html"   class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">History</a>
+        <a href="education.html" class="px-3.5 py-2 rounded-lg bg-heart-50 text-heart-700 font-medium">Learn</a>
+        <button onclick="localStorage.removeItem('token');window.location.href='index.html'" class="ml-2 px-3.5 py-2 rounded-lg text-gray-400 hover:text-heart-600 hover:bg-heart-50 transition text-xs font-medium uppercase tracking-wider">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-12">
+
+    <!-- Hero -->
+    <section class="text-center fade-in">
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-3 text-navy-900">Understanding Your Heart</h1>
+      <p class="text-gray-500 max-w-xl mx-auto">Knowledge is the first step to better heart health. Learn about arrhythmia, common triggers, and evidence-based strategies.</p>
+    </section>
+
+    <!-- ═══ What is Arrhythmia? ═══ -->
+    <section class="fade-in" style="animation-delay:.05s">
+      <h2 class="text-xl font-bold mb-5 flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </span>
+        What is Arrhythmia?
+      </h2>
+
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div class="card rounded-2xl p-6 card-hover shadow-sm">
+          <h3 class="font-semibold text-navy-900 mb-2">Overview</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Arrhythmia is an irregular heartbeat — your heart may beat too fast (tachycardia), too slow (bradycardia), or with an irregular rhythm. While occasional flutters are common, persistent arrhythmias can lead to stroke, heart failure, or cardiac arrest if left untreated.</p>
+        </div>
+        <div class="card rounded-2xl p-6 card-hover shadow-sm">
+          <h3 class="font-semibold text-navy-900 mb-2">Types</h3>
+          <ul class="text-gray-500 text-sm space-y-2">
+            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span><span><strong class="text-navy-800">Atrial Fibrillation (AFib)</strong> — irregular, often rapid, upper-chamber rhythm. Most common type.</span></li>
+            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span><span><strong class="text-navy-800">Supraventricular Tachycardia (SVT)</strong> — episodes of abnormally fast heart rate originating above the ventricles.</span></li>
+            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span><span><strong class="text-navy-800">Premature Ventricular Contractions (PVCs)</strong> — extra heartbeats that begin in the lower chambers.</span></li>
+            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span><span><strong class="text-navy-800">Bradycardia</strong> — a heart rate below 60 BPM not caused by fitness.</span></li>
+          </ul>
+        </div>
+        <div class="card rounded-2xl p-6 card-hover shadow-sm sm:col-span-2">
+          <h3 class="font-semibold text-navy-900 mb-2">Common Symptoms</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">💓</span> Heart palpitations</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">😵‍💫</span> Dizziness</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">😮‍💨</span> Shortness of breath</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">🫠</span> Fatigue</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">😰</span> Chest discomfort</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">🫨</span> Fluttering sensation</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">😶‍🌫️</span> Lightheadedness</div>
+            <div class="flex items-center gap-2 text-gray-500"><span class="text-lg">😰</span> Anxiety</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Lifestyle Triggers ═══ -->
+    <section class="fade-in" style="animation-delay:.1s">
+      <h2 class="text-xl font-bold mb-5 flex items-center gap-2 text-navy-900">
+        <span class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </span>
+        Lifestyle Triggers
+      </h2>
+
+      <div class="grid sm:grid-cols-3 gap-5">
+        <!-- Caffeine -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-emerald-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">☕</span>
+            <h3 class="font-semibold text-emerald-700">Caffeine</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed mb-3">Caffeine stimulates the central nervous system and can increase heart rate and blood pressure. High doses (>400 mg/day) can trigger palpitations, especially in sensitive individuals.</p>
+          <div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+            <p class="font-medium text-navy-800 mb-1">Common sources:</p>
+            <ul class="space-y-0.5">
+              <li>Coffee (8 oz): ~95 mg</li>
+              <li>Espresso: ~63 mg</li>
+              <li>Energy drink: ~80-160 mg</li>
+              <li>Green tea: ~28 mg</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Alcohol -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-rose-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">🍷</span>
+            <h3 class="font-semibold text-rose-700">Alcohol</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed mb-3">Even moderate alcohol consumption can trigger atrial fibrillation — a phenomenon known as "Holiday Heart Syndrome." Binge drinking dramatically increases the risk.</p>
+          <div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+            <p class="font-medium text-navy-800 mb-1">Key facts:</p>
+            <ul class="space-y-0.5">
+              <li>1 drink raises AFib risk ~8%</li>
+              <li>Binge drinking = highest risk</li>
+              <li>Effects can be delayed 12-36h</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Sleep -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-blue-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">😴</span>
+            <h3 class="font-semibold text-blue-700">Sleep</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed mb-3">Poor sleep and sleep deprivation disrupt the autonomic nervous system, increasing sympathetic (fight-or-flight) activity. This elevates resting heart rate and raises arrhythmia risk.</p>
+          <div class="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+            <p class="font-medium text-navy-800 mb-1">Recommendations:</p>
+            <ul class="space-y-0.5">
+              <li>Aim for 7-9 hours nightly</li>
+              <li>Consistent sleep schedule helps</li>
+              <li>Sleep apnea → get screened</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Stress -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-orange-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">😰</span>
+            <h3 class="font-semibold text-orange-700">Stress & Anxiety</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed">Chronic stress floods the body with cortisol and adrenaline, which can trigger or worsen arrhythmias. Practice deep breathing, meditation, or yoga to activate the parasympathetic nervous system.</p>
+        </div>
+
+        <!-- Exercise -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-purple-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">🏃</span>
+            <h3 class="font-semibold text-purple-700">Exercise</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed">Moderate exercise protects the heart, but extreme endurance training can increase AFib risk. Track your heart rate during workouts and watch for unusual spikes or irregular rhythms.</p>
+        </div>
+
+        <!-- Dehydration -->
+        <div class="card rounded-2xl p-6 card-hover shadow-sm border-t-4 border-cyan-400">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">💧</span>
+            <h3 class="font-semibold text-cyan-700">Dehydration</h3>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed">Dehydration reduces blood volume and electrolyte levels (potassium, magnesium), forcing the heart to work harder and potentially causing irregular rhythms. Aim for 8+ glasses of water daily.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ When to Seek Help ═══ -->
+    <section class="fade-in" style="animation-delay:.15s">
+      <h2 class="text-xl font-bold mb-5 flex items-center gap-2 text-navy-900">
+        <span class="w-8 h-8 rounded-lg bg-heart-50 flex items-center justify-center text-heart-600">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18.364 5.636a9 9 0 11-12.728 0M12 9v4m0 4h.01"/></svg>
+        </span>
+        When to Seek Medical Help
+      </h2>
+      <div class="card rounded-2xl p-6 border-l-4 border-heart-500 shadow-sm bg-heart-50/30">
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">Contact your doctor or visit an emergency room if you experience:</p>
+        <div class="grid sm:grid-cols-2 gap-3 text-sm">
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Heart rate > 150 BPM at rest</div>
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Chest pain or pressure</div>
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Fainting or near-fainting</div>
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Severe shortness of breath</div>
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Palpitations lasting > 15 min</div>
+          <div class="flex items-center gap-2 text-gray-500"><span class="text-heart-500">⚠️</span> Sudden weakness or numbness</div>
+        </div>
+        <p class="text-gray-400 text-xs mt-4 italic">HealthLog is a tracking tool, not a medical device. Always consult a healthcare professional for diagnosis and treatment.</p>
+      </div>
+    </section>
+
+    <!-- Disclaimer -->
+    <p class="text-center text-gray-400 text-xs pb-6 fade-in" style="animation-delay:.2s">&copy; 2026 HealthLog. Educational content only — not medical advice.</p>
+  </main>
+
+</body>
+</html>

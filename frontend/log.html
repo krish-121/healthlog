@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLog — Daily Log</title>
+  <meta name="description" content="Log your morning check-in, caffeine intake, alcohol consumption, and heart rate." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            heart: { 50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d' },
+            navy: { 50: '#f0f4f8', 100: '#d9e2ec', 200: '#bcccdc', 300: '#9fb3c8', 400: '#829ab1', 500: '#627d98', 600: '#486581', 700: '#334e68', 800: '#243b53', 900: '#1e3a5f' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .08);
+    }
+
+    .fade-in {
+      animation: fadeIn .45s ease both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .input-focus:focus {
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, .12);
+      border-color: #dc2626;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #dc2626;
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(220, 38, 38, .3);
+    }
+
+    .slider::-moz-range-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #dc2626;
+      cursor: pointer;
+      border: none;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+    }
+
+    .toast {
+      animation: slideUp .35s ease both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gray-50 text-navy-900">
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="dashboard.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-heart-600 flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-navy-900">Health<span
+            class="text-heart-600">Log</span></span>
+      </a>
+      <div class="flex items-center gap-1 text-sm">
+        <a href="dashboard.html"
+          class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Dashboard</a>
+        <a href="log.html" class="px-3.5 py-2 rounded-lg bg-heart-50 text-heart-700 font-medium">Log</a>
+        <a href="history.html"
+          class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">History</a>
+        <a href="education.html"
+          class="px-3.5 py-2 rounded-lg text-gray-500 hover:text-navy-900 hover:bg-gray-100 transition">Learn</a>
+        <button onclick="logout()"
+          class="ml-2 px-3.5 py-2 rounded-lg text-gray-400 hover:text-heart-600 hover:bg-heart-50 transition text-xs font-medium uppercase tracking-wider">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+
+    <div class="fade-in flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-navy-900 mb-1">Daily Log</h1>
+        <p class="text-gray-500 text-sm">Record or edit your vitals and lifestyle</p>
+      </div>
+      <div>
+        <input type="date" id="global-log-date" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white outline-none input-focus font-medium">
+      </div>
+    </div>
+
+    <!-- ═══ 1. Morning Check-in ═══ -->
+    <section class="card rounded-2xl p-6 fade-in" style="animation-delay:.05s">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path
+              d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 7.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-navy-900">Morning Check-in</h2>
+          <p class="text-xs text-gray-400">How did you sleep? How are you feeling?</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label class="flex items-center justify-between text-sm font-medium text-navy-800 mb-2">
+            Sleep Hours <span id="sleep-val" class="text-heart-600 font-bold">7h</span>
+          </label>
+          <input id="sleep-slider" type="range" min="0" max="14" step="0.5" value="7" class="slider w-full"
+            oninput="document.getElementById('sleep-val').textContent=this.value+'h'" />
+          <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>0h</span><span>14h</span></div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-2">Mood</label>
+          <div id="mood-selector" class="flex gap-2 flex-wrap">
+            <button data-mood="great"
+              class="mood-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition">😊
+              Great</button>
+            <button data-mood="good"
+              class="mood-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition">🙂
+              Good</button>
+            <button data-mood="tired"
+              class="mood-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-500 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50 transition">😴
+              Tired</button>
+            <button data-mood="stressed"
+              class="mood-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-600 hover:bg-orange-50 transition">😰
+              Stressed</button>
+            <button data-mood="bad"
+              class="mood-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-50 border border-gray-200 text-gray-500 hover:border-heart-300 hover:text-heart-600 hover:bg-heart-50 transition">😟
+              Bad</button>
+          </div>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-navy-800 mb-2">Notes (optional)</label>
+          <textarea id="morning-notes" rows="2" placeholder="Any symptoms, observations…"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition resize-none text-sm"></textarea>
+        </div>
+      </div>
+
+      <button id="submit-morning"
+        class="mt-5 w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-amber-500 hover:bg-amber-600 shadow-md hover:shadow-lg hover:translate-y-[-1px] transition-all">
+        Save Check-in
+      </button>
+    </section>
+
+    <!-- ═══ 2. Caffeine Tracking ═══ -->
+    <section class="card rounded-2xl p-6 fade-in" style="animation-delay:.1s">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M17 8h1a4 4 0 010 8h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zm0 13h18" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-navy-900">Caffeine Intake</h2>
+          <p class="text-xs text-gray-400">Select a drink to auto-fill caffeine (mg)</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4">
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Time</label>
+          <input id="caffeine-time" type="time"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm" />
+        </div>
+        <div class="sm:col-span-6">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Drink</label>
+          <div class="flex gap-2">
+            <select id="caffeine-drink"
+              class="flex-1 px-3 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm appearance-none cursor-pointer">
+              <option value="" data-mg="0">— Pick a drink —</option>
+              <optgroup label="Standard Drinks">
+                <option value="Coffee (8 oz)" data-mg="95">☕ Coffee (8 oz)</option>
+                <option value="Espresso Shot" data-mg="63">☕ Espresso Shot</option>
+                <option value="Cold Brew (12 oz)" data-mg="175">☕ Cold Brew (12 oz)</option>
+                <option value="Green Tea" data-mg="28">🍵 Green Tea</option>
+                <option value="Black Tea" data-mg="47">🍵 Black Tea</option>
+                <option value="Energy Drink" data-mg="80">⚡ Energy Drink</option>
+                <option value="Large Energy Drink" data-mg="160">⚡ Large Energy Drink</option>
+                <option value="Cola" data-mg="34">🥤 Cola</option>
+                <option value="Pre-workout" data-mg="200">💪 Pre-workout</option>
+              </optgroup>
+              <optgroup id="custom-drinks-group" label="My Custom Drinks"></optgroup>
+              <option value="Custom">➕ Add Custom Drink...</option>
+            </select>
+            <input id="caffeine-qty" type="number" min="1" max="20" value="1" title="Quantity" placeholder="Qty"
+              class="w-16 px-2 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 text-center outline-none input-focus transition text-sm" />
+          </div>
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Mg/drink</label>
+          <input id="caffeine-mg" type="number" min="0" placeholder="0"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Severity (1–10)</label>
+          <input id="caffeine-severity" type="number" min="1" max="10" value="1" placeholder="1"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+          <p class="text-[10.5px] text-gray-500 mt-1.5 leading-tight">1 = Barely noticeable, 10 = Extreme effect.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Description (optional)</label>
+          <input id="caffeine-desc" type="text" placeholder="e.g. 2 espresso shots before 9am"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+      </div>
+
+      <div id="caffeine-save-wrapper" class="hidden mb-5 flex items-center gap-2">
+        <input type="checkbox" id="caffeine-save-custom"
+          class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+        <label for="caffeine-save-custom" class="text-xs font-medium text-navy-800">Save as a custom drink</label>
+      </div>
+
+      <button id="submit-caffeine"
+        class="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg hover:translate-y-[-1px] transition-all">
+        Log Caffeine
+      </button>
+    </section>
+
+    <!-- ═══ 3. Alcohol Tracking ═══ -->
+    <section class="card rounded-2xl p-6 fade-in" style="animation-delay:.15s">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M8 2h8l-2 9H10L8 2zM12 11v8m-4 0h8" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-navy-900">Alcohol Intake</h2>
+          <p class="text-xs text-gray-400">Track drinks consumed today</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4">
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Time</label>
+          <input id="alcohol-time" type="time"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm" />
+        </div>
+        <div class="sm:col-span-4">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Severity (1–10)</label>
+          <input id="alcohol-severity" type="number" min="1" max="10" value="3" placeholder="3"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+          <p class="text-[10.5px] text-gray-500 mt-1.5 leading-tight">1 = Barely noticeable. Skip if you didn't drink.
+          </p>
+        </div>
+        <div class="sm:col-span-5">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Description (optional)</label>
+          <input id="alcohol-desc" type="text" placeholder="e.g. 2 beers at dinner"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+      </div>
+
+      <button id="submit-alcohol"
+        class="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg hover:translate-y-[-1px] transition-all">
+        Log Alcohol
+      </button>
+    </section>
+
+    <!-- ═══ 4. Heart Rate ═══ -->
+    <section class="card rounded-2xl p-6 fade-in" style="animation-delay:.2s">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-heart-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-heart-600" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-navy-900">Heart Rate & Blood Pressure</h2>
+          <p class="text-xs text-gray-400">Enter your current readings</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4">
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Time</label>
+          <input id="heart-time" type="time"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm" />
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Heart Rate (BPM)</label>
+          <input id="heart-bpm" type="number" min="30" max="250" placeholder="72"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Systolic (mmHg)</label>
+          <input id="heart-sys" type="number" min="60" max="300" placeholder="120"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-sm font-medium text-navy-800 mb-1.5">Diastolic (mmHg)</label>
+          <input id="heart-dia" type="number" min="30" max="200" placeholder="80"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 placeholder-gray-400 outline-none input-focus transition text-sm" />
+        </div>
+      </div>
+
+      <button id="submit-heart"
+        class="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-heart-600 hover:bg-heart-700 shadow-md hover:shadow-lg hover:translate-y-[-1px] transition-all">
+        Log Heart Data
+      </button>
+    </section>
+
+    <!-- ═══ 5. Symptom Logger ═══ -->
+    <section class="card rounded-2xl p-6 border-l-4 border-heart-500 shadow-sm bg-heart-50/20 fade-in"
+      style="animation-delay:.25s">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-heart-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-heart-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-navy-900">Log a Symptom</h2>
+            <p class="text-xs text-gray-400">Record an acute cardiac event</p>
+          </div>
+        </div>
+        <button id="symptom-now-btn"
+          class="px-3 py-1.5 bg-heart-100 text-heart-700 text-xs font-semibold rounded-lg hover:bg-heart-200 transition">Set
+          Time to NOW</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-2">Time of Symptom</label>
+          <input id="symptom-time" type="time"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-2">Severity (1-10)</label>
+          <input id="symptom-severity" type="number" min="1" max="10" value="5"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm" />
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-navy-800 mb-2">Symptom Type (Select all that apply)</label>
+        <div id="symptom-types" class="flex flex-wrap gap-2">
+          <button data-val="Racing Heart"
+            class="symp-chip px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-500 hover:border-heart-400 transition">Racing
+            Heart</button>
+          <button data-val="Skipped Beats"
+            class="symp-chip px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-500 hover:border-heart-400 transition">Skipped
+            Beats</button>
+          <button data-val="Dizziness"
+            class="symp-chip px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-500 hover:border-heart-400 transition">Dizziness</button>
+          <button data-val="Shortness of Breath"
+            class="symp-chip px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-500 hover:border-heart-400 transition">Shortness
+            of Breath</button>
+          <button data-val="Chest Pain"
+            class="symp-chip px-3 py-1.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-500 hover:border-heart-400 transition">Chest
+            Pain</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-2">Duration</label>
+          <select id="symptom-duration"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm cursor-pointer">
+            <option value="< 1 min">&lt; 1 min</option>
+            <option value="1-5 mins">1-5 mins</option>
+            <option value="5-30 mins">5-30 mins</option>
+            <option value="> 30 mins">&gt; 30 mins</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-navy-800 mb-2">Activity at Onset</label>
+          <select id="symptom-activity"
+            class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm cursor-pointer">
+            <option value="">— Select —</option>
+            <option value="Resting">Resting / Sitting</option>
+            <option value="Exercising">Exercising</option>
+            <option value="After eating">After eating</option>
+            <option value="Waking up">Waking up</option>
+            <option value="Stressful event">Stressful event</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-navy-800 mb-2 text-heart-600">Red Flags</label>
+        <div class="flex flex-col gap-2">
+          <label class="flex items-center gap-2 text-sm text-navy-900 cursor-pointer"><input type="checkbox"
+              class="symptom-redflag w-4 h-4 rounded text-heart-600 focus:ring-heart-500 border-gray-300"
+              value="Felt faint"> Felt faint</label>
+          <label class="flex items-center gap-2 text-sm text-navy-900 cursor-pointer"><input type="checkbox"
+              class="symptom-redflag w-4 h-4 rounded text-heart-600 focus:ring-heart-500 border-gray-300"
+              value="Lost consciousness"> Lost consciousness</label>
+          <label class="flex items-center gap-2 text-sm text-navy-900 cursor-pointer"><input type="checkbox"
+              class="symptom-redflag w-4 h-4 rounded text-heart-600 focus:ring-heart-500 border-gray-300"
+              value="Chest pressure"> Chest pressure</label>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-navy-800 mb-2">Notes (Optional)</label>
+        <textarea id="symptom-notes" rows="2" placeholder="Any highly specific details..."
+          class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-navy-900 outline-none input-focus transition text-sm resize-none"></textarea>
+      </div>
+
+      <button id="submit-symptom"
+        class="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold text-white bg-heart-600 hover:bg-heart-700 shadow-md hover:shadow-lg hover:translate-y-[-1px] transition-all">
+        Log Symptom
+      </button>
+    </section>
+
+    <!-- ═══ 6. Event Manager ═══ -->
+    <section class="card rounded-2xl p-6 fade-in" style="animation-delay:.3s">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-navy-900">Logged Events</h2>
+          <p class="text-xs text-gray-400">Manage discrete events for the selected date</p>
+        </div>
+      </div>
+      
+      <div id="event-manager-list" class="space-y-3">
+        <!-- Events populated via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/log.js"></script>
+</body>
+
+</html>
