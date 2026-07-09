@@ -1,4 +1,4 @@
-const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5000/api' : '/api';
+const API = 'https://healthlog-backend-l0u0.onrender.com/api';
 const token = localStorage.getItem('token');
 
 if (!token) {
